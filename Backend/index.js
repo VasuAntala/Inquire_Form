@@ -1,6 +1,13 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import crypto from 'crypto'
+
+// Polyfill crypto for older Node.js versions (e.g. Node 18)
+if (!globalThis.crypto) {
+    globalThis.crypto = crypto
+}
+
 import { mongooseConnection } from './src/Database/DB.js'
 import router from './src/router/index.js'
 const PORT = process.env.PORT || 3000;
