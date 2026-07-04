@@ -35,7 +35,14 @@ export default function InquiryForm({ onSuccess, editingInquiry, onCancelEdit })
   const [emailError, setEmailError] = useState('');
 
   React.useEffect(() => {
-    setFormData(editingInquiry || defaultState);
+    if (editingInquiry) {
+      setFormData({
+        ...editingInquiry,
+        phone: editingInquiry.phone !== undefined && editingInquiry.phone !== null ? String(editingInquiry.phone) : ''
+      });
+    } else {
+      setFormData(defaultState);
+    }
   }, [editingInquiry]);
 
   const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
@@ -58,7 +65,8 @@ export default function InquiryForm({ onSuccess, editingInquiry, onCancelEdit })
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.phone && formData.phone.length !== 10) {
+    const phoneStr = String(formData.phone || '');
+    if (phoneStr && phoneStr.length !== 10) {
       setPhoneError('Phone number must be exactly 10 digits.');
       return;
     }

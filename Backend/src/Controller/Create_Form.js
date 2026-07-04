@@ -9,11 +9,13 @@ export const Create_Form = async (req, res) => {
             return res.status(400).json({ success: false, message: "All fields (name, subject, email, phone, message) are required." });
         }
 
+        const phoneStr = String(phone !== undefined && phone !== null ? phone : '').trim();
+
         if (
             typeof name !== 'string' || !name.trim() ||
             typeof subject !== 'string' || !subject.trim() ||
             typeof email !== 'string' || !email.trim() ||
-            typeof phone !== 'string' || !phone.trim() ||
+            !phoneStr ||
             typeof message !== 'string' || !message.trim()
         ) {
             return res.status(400).json({ success: false, message: "All fields must contain valid non-empty text." });
