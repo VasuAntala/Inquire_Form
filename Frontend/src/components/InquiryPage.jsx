@@ -13,6 +13,9 @@ export default function InquiryPage() {
   // ── editingInquiry: set by InquiryTable Edit button, consumed by InquiryForm
   const [editingInquiry, setEditingInquiry] = useState(null);
 
+  // ── track if we have at least 1 record to show the search bar
+  const [hasData, setHasData] = useState(false);
+
   const handleSuccess = () => {
     setRefreshKey(prev => prev + 1);
   };
@@ -41,11 +44,12 @@ export default function InquiryPage() {
 
       {/* Table section — owns GET /form/all & DELETE /delete/:id via axios */}
       <div style={{ width: '100%', maxWidth: '700px' }}>
-        <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        {hasData && <SearchBar value={searchQuery} onChange={setSearchQuery} />}
         <InquiryTable
           refreshKey={refreshKey}
           searchQuery={searchQuery}
           onEdit={handleEditInquiry}
+          onDataCountChange={(count) => setHasData(count > 0)}
         />
       </div>
     </div>

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
-export default function InquiryTable({ onEdit, refreshKey, searchQuery }) {
+export default function InquiryTable({ onEdit, refreshKey, searchQuery, onDataCountChange }) {
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,7 +11,12 @@ export default function InquiryTable({ onEdit, refreshKey, searchQuery }) {
     setLoading(true);
     axios.get(`${API_BASE}/api/inquiries`)
       .then(({ data }) => {
-        if (data.success) setInquiries(data.data);
+        if (data.success) {
+          setInquiries(data.data);
+          if (onDataCountChange) {
+            onDataCountChange(data.data.length);
+          }
+        }
       })
       .catch(err => console.error('Failed to load inquiries:', err))
       .finally(() => setLoading(false));
@@ -21,7 +26,13 @@ export default function InquiryTable({ onEdit, refreshKey, searchQuery }) {
     try {
       const { data } = await axios.delete(`${API_BASE}/api/inquiries/${id}`);
       if (data.success) {
-        setInquiries(prev => prev.filter(inq => inq._id !== id));
+        setInquiries(prev => {
+          const updated = prev.filter(inq => inq._id !== id);
+          if (onDataCountChange) {
+            onDataCountChange(updated.length);
+          }
+          return updated;
+        });
       } else {
         alert('Failed to delete: ' + data.message);
       }
@@ -32,9 +43,11 @@ export default function InquiryTable({ onEdit, refreshKey, searchQuery }) {
   };
 
   const filtered = inquiries.filter(inq =>
-    inq.name.toLowerCase().includes((searchQuery || '').toLowerCase()) ||
-    inq.subject.toLowerCase().includes((searchQuery || '').toLowerCase()) ||
-    inq.email.toLowerCase().includes((searchQuery || '').toLowerCase())
+    (inq.name || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
+    (inq.subject || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
+    (inq.email || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
+    (inq.phone || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
+    (inq.message || '').toLowerCase().includes((searchQuery || '').toLowerCase())
   );
 
   if (loading) {
