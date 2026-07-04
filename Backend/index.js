@@ -22,7 +22,6 @@ const app = express()
 app.use(express.json())
 app.use(cors({
     origin: (origin, callback) => {
-        // Automatically allow any origin (reflects the request origin)
         callback(null, true);
     },
     credentials: true,
