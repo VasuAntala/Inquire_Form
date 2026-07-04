@@ -20,11 +20,11 @@ export const Create_Form = async (req, res) => {
         }
 
         const data = await InquiryForm.create({
-            name: name.trim(),
-            subject: subject.trim(),
-            email: email.trim(),
-            phone: phone.trim(),
-            message: message.trim()
+            name,
+            subject,
+            email,
+            phone,
+            message
         });
 
         console.log("Form Submitted Successfully", data);

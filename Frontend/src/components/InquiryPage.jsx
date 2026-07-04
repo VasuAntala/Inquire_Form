@@ -4,16 +4,12 @@ import InquiryTable from './Inquiry_Table';
 import SearchBar from './SearchBar';
 
 export default function InquiryPage() {
-  // ── refreshKey: owned here, incremented after create/update → InquiryTable re-fetches
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // ── searchQuery: owned here, passed to SearchBar & InquiryTable for filtering
   const [searchQuery, setSearchQuery] = useState('');
 
-  // ── editingInquiry: set by InquiryTable Edit button, consumed by InquiryForm
   const [editingInquiry, setEditingInquiry] = useState(null);
 
-  // ── track if we have at least 1 record to show the search bar
   const [hasData, setHasData] = useState(false);
 
   const handleSuccess = () => {
