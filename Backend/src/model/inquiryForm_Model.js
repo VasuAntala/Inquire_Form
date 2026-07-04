@@ -1,36 +1,26 @@
 import mongoose from 'mongoose'
 
-export const InquiryForm = new mongoose.Schema({
-    name:
-    {
+const inquiryFormSchema = new mongoose.Schema({
+    name: {
         type: String,
         required: true
     },
-    subject:
-    {
+    subject: {
         type: String,
         required: true
     },
-    email:
-    {
+    email: {
         type: String,
         required: true
     },
-    phone:
-    {
+    phone: {
         type: String,
         required: true
     },
-    message:
-    {
+    message: {
         type: String,
         required: true
-    },
-    CreatedAt:
-    {
-        type: Date.now()
     }
-})
+}, { timestamps: true })
 
-const Inquiry_Form = new mongoose.model("inquiry_forms", InquiryForm)
-
+export const InquiryForm = mongoose.model("inquiry_forms", inquiryFormSchema)
