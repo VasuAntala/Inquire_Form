@@ -5,7 +5,6 @@ export const Update_Form = async (req, res) => {
         const { id } = req.params;
         const { name, subject, email, phone, message } = req.body;
 
-        // Validation: check that any field is not empty
         if (!name || !subject || !email || !phone || !message) {
             return res.status(400).json({ success: false, message: "All fields (name, subject, email, phone, message) are required." });
         }
@@ -23,11 +22,11 @@ export const Update_Form = async (req, res) => {
         const data = await InquiryForm.findByIdAndUpdate(
             id,
             {
-                name: name.trim(),
-                subject: subject.trim(),
-                email: email.trim(),
-                phone: phone.trim(),
-                message: message.trim()
+                name,
+                subject,
+                email,
+                phone,
+                message
             },
             { new: true } // return updated document
         );

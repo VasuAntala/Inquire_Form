@@ -17,7 +17,7 @@ const inquiryFormSchema = new mongoose.Schema({
         required: true
     },
     phone: {
-        type: String,
+        type: Number,
         trim: true,
         required: true
     },
