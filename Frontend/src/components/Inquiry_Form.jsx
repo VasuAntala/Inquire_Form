@@ -68,7 +68,7 @@ export default function InquiryForm({ onSuccess, editingInquiry, onCancelEdit })
     }
     try {
       if (editingInquiry) {
-        const { data } = await axios.put(`${API_BASE}/update/${editingInquiry._id}`, formData);
+        const { data } = await axios.put(`${API_BASE}/api/inquiries/${editingInquiry._id}`, formData);
         if (data.success) {
           onCancelEdit();   // close edit mode
           onSuccess();      // tell InquiryTable to re-fetch
@@ -76,7 +76,7 @@ export default function InquiryForm({ onSuccess, editingInquiry, onCancelEdit })
           alert('Failed to update: ' + data.message);
         }
       } else {
-        const { data } = await axios.post(`${API_BASE}/Submit`, formData);
+        const { data } = await axios.post(`${API_BASE}/api/inquiries`, formData);
         if (data.success) {
           onSuccess();      // tell InquiryTable to re-fetch
           setFormData(defaultState);

@@ -9,7 +9,7 @@ export default function InquiryTable({ onEdit, refreshKey, searchQuery }) {
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`${API_BASE}/form/all`)
+    axios.get(`${API_BASE}/api/inquiries`)
       .then(({ data }) => {
         if (data.success) setInquiries(data.data);
       })
@@ -19,7 +19,7 @@ export default function InquiryTable({ onEdit, refreshKey, searchQuery }) {
 
   const handleDelete = async (id) => {
     try {
-      const { data } = await axios.delete(`${API_BASE}/delete/${id}`);
+      const { data } = await axios.delete(`${API_BASE}/api/inquiries/${id}`);
       if (data.success) {
         setInquiries(prev => prev.filter(inq => inq._id !== id));
       } else {

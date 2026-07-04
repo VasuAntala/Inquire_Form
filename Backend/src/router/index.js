@@ -6,9 +6,9 @@ import { Delete_Form } from "../Controller/Delete_Form.js";
 
 const route = express.Router();
 
-route.post('/Submit', Create_Form)
-route.get('/form/all', GetData)
-route.put('/update/:id', Update_Form)
-route.delete('/delete/:id', Delete_Form)
+route.post('/api/inquiries', Create_Form)
+route.get('/api/inquiries', GetData)
+route.put('/api/inquiries/:id', Update_Form)
+route.delete('/api/inquiries/:id', Delete_Form)
 
 export default route;

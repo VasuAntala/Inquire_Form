@@ -5,9 +5,31 @@ export const Update_Form = async (req, res) => {
         const { id } = req.params;
         const { name, subject, email, phone, message } = req.body;
 
+        // Validation: check that any field is not empty
+        if (!name || !subject || !email || !phone || !message) {
+            return res.status(400).json({ success: false, message: "All fields (name, subject, email, phone, message) are required." });
+        }
+
+        if (
+            typeof name !== 'string' || !name.trim() ||
+            typeof subject !== 'string' || !subject.trim() ||
+            typeof email !== 'string' || !email.trim() ||
+            typeof phone !== 'string' || !phone.trim() ||
+            typeof message !== 'string' || !message.trim()
+        ) {
+            return res.status(400).json({ success: false, message: "All fields must contain valid non-empty text." });
+        }
+
         const data = await InquiryForm.findByIdAndUpdate(
             id,
-            { name, subject, email, phone, message },
+            {
+                name: name.trim(),
+                subject: subject.trim(),
+                email: email.trim(),
+                phone: phone.trim(),
+                message: message.trim()
+            },
+            { new: true } // return updated document
         );
 
         if (!data) {
