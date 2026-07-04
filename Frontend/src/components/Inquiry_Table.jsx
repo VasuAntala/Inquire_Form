@@ -43,11 +43,11 @@ export default function InquiryTable({ onEdit, refreshKey, searchQuery, onDataCo
   };
 
   const filtered = inquiries.filter(inq =>
-    (inq.name || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
-    (inq.subject || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
-    (inq.email || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
-    (inq.phone || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
-    (inq.message || '').toLowerCase().includes((searchQuery || '').toLowerCase())
+    String(inq.name || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
+    String(inq.subject || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
+    String(inq.email || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
+    String(inq.phone || '').toLowerCase().includes((searchQuery || '').toLowerCase()) ||
+    String(inq.message || '').toLowerCase().includes((searchQuery || '').toLowerCase())
   );
 
   if (loading) {
