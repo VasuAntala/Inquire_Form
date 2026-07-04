@@ -14,14 +14,7 @@ const app = express()
 
 app.use(express.json())
 app.use(cors({
-    origin: (origin, callback) => {
-        // Allow requests with no origin (Postman, curl, server-to-server)
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error(`CORS blocked: ${origin}`));
-        }
-    },
+    origin: allowedOrigins,
     credentials: true,
 }))
 app.use(router)
