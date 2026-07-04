@@ -3,8 +3,14 @@ import mongoose from 'mongoose';
 export async function mongooseConnection() {
     mongoose.set('strictQuery', true);
 
+    const uri = process.env.MONGO_URI;
+    if (!uri) {
+        console.error('MONGO_URI is not defined in .env');
+        process.exit(1);
+    }
+
     try {
-        await mongoose.connect("mongodb+srv://vasuantala123:Vasu8283@cluster0.p1ilxej.mongodb.net/InquiryForm");
+        await mongoose.connect(uri);
         console.log('Database successfully connected');
     } catch (err) {
         console.error('MongoDB connection error:', err);

@@ -1,7 +1,9 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { mongooseConnection } from './src/Databse/DB.js'
 import router from './src/router/index.js'
+const PORT = process.env.PORT || 3000;
 
 const app = express()
 
@@ -11,7 +13,6 @@ app.use(router)
 
 mongooseConnection();
 
-
-app.listen(3000, () => {
-    console.log('server started in 3000 port')
+app.listen(PORT, () => {
+    console.log(`server started on port ${PORT}`)
 });
