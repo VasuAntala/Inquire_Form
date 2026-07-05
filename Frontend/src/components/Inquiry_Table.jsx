@@ -3,12 +3,15 @@ import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
-export default function InquiryTable({ onEdit, refreshKey, searchQuery, onDataCountChange }) {
+export default function InquiryTable({ onEdit, refreshKey, searchQuery, onDataCountChange, addToast, setIsOffline }) {
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
+  const [localRetry, setLocalRetry] = useState(0);
 
   useEffect(() => {
     setLoading(true);
+    setFetchError(null);
     axios.get(`${API_BASE}/api/inquiries`)
       .then(({ data }) => {
         if (data.success) {
@@ -16,16 +19,28 @@ export default function InquiryTable({ onEdit, refreshKey, searchQuery, onDataCo
           if (onDataCountChange) {
             onDataCountChange(data.data.length);
           }
+          if (setIsOffline) setIsOffline(false);
+        } else {
+          setFetchError(data.message || 'Failed to retrieve inquiries.');
         }
       })
-      .catch(err => console.error('Failed to load inquiries:', err))
+      .catch(err => {
+        console.error('Failed to load inquiries:', err);
+        if (!err.response || err.code === 'ERR_NETWORK') {
+          if (setIsOffline) setIsOffline(true);
+          setFetchError('Could not connect to the backend server. Make sure the backend is running.');
+        } else {
+          setFetchError(err.response?.data?.message || err.message || 'An error occurred while loading inquiries.');
+        }
+      })
       .finally(() => setLoading(false));
-  }, [refreshKey]);
+  }, [refreshKey, localRetry]);
 
   const handleDelete = async (id) => {
     try {
       const { data } = await axios.delete(`${API_BASE}/api/inquiries/${id}`);
       if (data.success) {
+        if (addToast) addToast('Inquiry deleted successfully.', 'success');
         setInquiries(prev => {
           const updated = prev.filter(inq => inq._id !== id);
           if (onDataCountChange) {
@@ -34,11 +49,17 @@ export default function InquiryTable({ onEdit, refreshKey, searchQuery, onDataCo
           return updated;
         });
       } else {
-        alert('Failed to delete: ' + data.message);
+        if (addToast) addToast('Failed to delete: ' + (data.message || 'Unknown response'), 'error');
       }
     } catch (err) {
       console.error('Delete error:', err);
-      alert('Could not reach the server.');
+      if (!err.response || err.code === 'ERR_NETWORK') {
+        if (setIsOffline) setIsOffline(true);
+        if (addToast) addToast('Cannot connect to server. Please verify if the backend is running.', 'error');
+      } else {
+        const errMsg = err.response?.data?.message || err.message || 'An error occurred while deleting.';
+        if (addToast) addToast(errMsg, 'error');
+      }
     }
   };
 
@@ -54,6 +75,63 @@ export default function InquiryTable({ onEdit, refreshKey, searchQuery, onDataCo
     return (
       <div style={{ textAlign: 'center', padding: '32px', color: '#aaa', fontSize: '0.9rem' }}>
         Loading inquiries...
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div style={{
+        background: '#fff',
+        borderRadius: '8px',
+        padding: '40px 24px',
+        textAlign: 'center',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+        marginTop: '8px',
+        border: '1px solid #fca5a5',
+      }}>
+        <div style={{
+          width: '52px',
+          height: '52px',
+          borderRadius: '50%',
+          background: '#fee2e2',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 14px',
+        }}>
+          <svg width="24" height="24" fill="none" stroke="#ef4444" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <p style={{ color: '#b91c1c', fontSize: '0.95rem', fontWeight: '600', marginBottom: '6px' }}>
+          Failed to Load Inquiries
+        </p>
+        <p style={{ color: '#4b5563', fontSize: '0.82rem', marginBottom: '20px', maxWidth: '320px', marginLeft: 'auto', marginRight: 'auto', lineHeight: '1.4' }}>
+          {fetchError}
+        </p>
+        <button
+          onClick={() => {
+            setLocalRetry(prev => prev + 1);
+            if (setIsOffline) setIsOffline(false);
+          }}
+          style={{
+            background: '#ef4444',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
+            padding: '8px 20px',
+            fontSize: '0.8rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'background 0.2s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = '#dc2626'}
+          onMouseLeave={e => e.currentTarget.style.background = '#ef4444'}
+        >
+          Try Again
+        </button>
       </div>
     );
   }

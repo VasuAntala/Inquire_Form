@@ -26,7 +26,7 @@ const inputStyle = {
   transition: 'border-color 0.2s',
 };
 
-export default function InquiryForm({ onSuccess, editingInquiry, onCancelEdit }) {
+export default function InquiryForm({ onSuccess, editingInquiry, onCancelEdit, addToast, setIsOffline }) {
   const defaultState = { name: '', email: '', phone: '', subject: '', message: '' };
   const [formData, setFormData] = useState(defaultState);
   const [focused, setFocused] = useState(null);
@@ -74,27 +74,38 @@ export default function InquiryForm({ onSuccess, editingInquiry, onCancelEdit })
       setEmailError('Enter a valid email address.');
       return;
     }
+    setSubmitting(true);
     try {
       if (editingInquiry) {
         const { data } = await axios.put(`${API_BASE}/api/inquiries/${editingInquiry._id}`, formData);
         if (data.success) {
+          if (addToast) addToast('Inquiry updated successfully!', 'success');
+          if (setIsOffline) setIsOffline(false);
           onCancelEdit();   // close edit mode
           onSuccess();      // tell InquiryTable to re-fetch
         } else {
-          alert('Failed to update: ' + data.message);
+          if (addToast) addToast('Failed to update: ' + (data.message || 'Unknown server response'), 'error');
         }
       } else {
         const { data } = await axios.post(`${API_BASE}/api/inquiries`, formData);
         if (data.success) {
+          if (addToast) addToast('Inquiry submitted successfully!', 'success');
+          if (setIsOffline) setIsOffline(false);
           onSuccess();      // tell InquiryTable to re-fetch
           setFormData(defaultState);
         } else {
-          alert('Failed to submit: ' + data.message);
+          if (addToast) addToast('Failed to submit: ' + (data.message || 'Unknown server response'), 'error');
         }
       }
     } catch (err) {
       console.error('Submit error:', err);
-      alert('Could not reach the server.');
+      if (!err.response || err.code === 'ERR_NETWORK') {
+        if (setIsOffline) setIsOffline(true);
+        if (addToast) addToast('Cannot connect to server. Please verify if the backend is running.', 'error');
+      } else {
+        const errMsg = err.response?.data?.message || err.message || 'An error occurred during submission.';
+        if (addToast) addToast(errMsg, 'error');
+      }
     } finally {
       setSubmitting(false);
     }
